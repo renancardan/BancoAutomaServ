@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const sequelize = require('./db');
+//const sequelize = require('./db');
 const mysql = require('mysql2');
 
 const app = express();
@@ -33,13 +33,14 @@ app.get('/', (req, res) => {
 });
 
 app.post('/VerList', async (req, res) => {
-    connection.query('SELECT * FROM list_pedido WHERE Telefone = ?', ['(99)98465-8735'], (error, results) => {
+  var Temp = new Date().getTime() - 21600000;
+    connection.query(`SELECT * FROM list_pedido WHERE Telefone = ? AND Status != 'concluido' AND Id_Emp = ? AND DataPed > ?`, [req.body.Tel, req.body.IdEmp, Temp], (error, results) => {
       if (error) return reject(error);
+      console.log(results)
       res.json(results);
   });
   
   });
-
 app.post('/dadoEmpresa', async (req, res) => {
   connection.query('SELECT * FROM empresa WHERE idEmp = ?', [req.body.IdEmp], (error, results) => {
     if (error) return reject(error);
@@ -51,10 +52,10 @@ app.post('/dadoEmpresa', async (req, res) => {
 app.post('/Pedido', async (req, res) => {
    // console.log(req.body)
    let jsonStringPed = JSON.stringify(req.body.Pedido);
-
-    connection.query('INSERT INTO list_pedido (Pedido, id_Emp, Telefone, Nome, End_Rua, End_Numero, End_Bairro, End_Comp, End_Cidade, End_Estado, Pg_Pix, Pg_CartDeb, Pg_CartCred, Pg_Cheque, Pg_Boleto, Pg_Dinheiro, Pg_Troco, Rec_Buscar, Rec_Consumoloc, Rec_Entregar, Rec_ValorEnt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [jsonStringPed, req.body.IdEmp, req.body.Tel, req.body.Nome, req.body.Rua , req.body.Numero , req.body.Bairro , req.body.Complemento , req.body.Cidade , req.body.Estado, req.body.Pix , req.body.CartDebi , req.body.CartCred , req.body.Cheque, req.body.Boleto , req.body.Dinheiro , req.body.Troco, req.body.Buscar, req.body.Consumo, req.body.Entreg, req.body.ValorEnt], (error, results) => {
+  var DataPed = new Date().getTime()
+    connection.query('INSERT INTO list_pedido (DataPed, Pedido, id_Emp, Telefone, Nome, End_Rua, End_Numero, End_Bairro, End_Comp, End_Cidade, End_Estado, Pg_Pix, Pg_CartDeb, Pg_CartCred, Pg_Cheque, Pg_Boleto, Pg_Dinheiro, Pg_Troco, Rec_Buscar, Rec_Consumoloc, Rec_Entregar, Rec_ValorEnt, Status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [DataPed, jsonStringPed, req.body.IdEmp, req.body.Tel, req.body.Nome, req.body.Rua , req.body.Numero , req.body.Bairro , req.body.Complemento , req.body.Cidade , req.body.Estado, req.body.Pix , req.body.CartDebi , req.body.CartCred , req.body.Cheque, req.body.Boleto , req.body.Dinheiro , req.body.Troco, req.body.Buscar, req.body.Consumo, req.body.Entreg, req.body.ValorEnt, "Pedido Enviado para Empresa"], (error, results) => {
         if (error) return reject(error);
-        console.log(results)
+       // console.log(results)
         res.json(results);
     });
 //     connection.query('INSERT INTO list_pedido (Pedido, id_Emp, Telefone, Nome, End_Rua, End_Numero, End_Bairro, End_Comp, End_Cidade, End_Estado, Pg_Pix, Pg_CartDeb, Pg_CartCred, Pg_Cheque, Pg_Boleto, Pg_Dinheiro, Pg_Troco, Rec_Buscar, Rec_Consumo, Rec_Entregar) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [req.body.Pedido, req.body.IdEmp, req.body.Tel, req.body.Nome , req.body.Rua , req.body.Numero , req.body.Bairro , req.body.Complemento , req.body.Cidade , req.body.Estado , req.body.Pix , req.body.CartDebi , req.body.CartCred , req.body.Cheque , req.body.Boleto , req.body.Dinheiro , req.body.Troco , req.body.Buscar , req.body.Consumo , req.body.Entreg ], (error, results) => {
@@ -159,6 +160,6 @@ app.post('/produtos', async (req, res) => {
 // res.json(ListSessao);
 // });
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+app.listen(5555, () => {
+  console.log('Server is running on port 5555');
 });
